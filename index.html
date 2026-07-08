@@ -396,11 +396,11 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
 
   submitBtn.disabled = true;
 
-  const jsonBlob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
   const fd = new FormData();
   fd.append('access_key', SPLITFORMS_ACCESS_KEY);
-  fd.append('participant_id', participantId);
-  fd.append('attachment', jsonBlob, `${participantId}.json`);
+  for (const [key, value] of Object.entries(record)) {
+    fd.append(key, value);
+  }
 
   try {
     const res = await fetch(SPLITFORMS_ENDPOINT, {
@@ -409,7 +409,7 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
       body: fd
     });
 
-    if (!res.ok) throw new Error(`Formspree responded ${res.status}`);
+    if (!res.ok) throw new Error(`SplitForms responded ${res.status}`);
 
     localStorage.setItem(SUBMITTED_KEY, participantId);
     document.getElementById('participantIdDisplay').textContent = participantId;
