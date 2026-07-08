@@ -190,20 +190,8 @@
   <h1>A few open-ended questions</h1>
   <p class="sub">Takes about 3–5 minutes. Your answers are anonymous.</p>
 
-  <!-- EXAMINER SETUP -->
-  <div class="panel" id="setupPanel">
-    <div class="consent-text" style="margin-bottom:16px;">
-      <strong>Examiner setup:</strong> choose whether this is a new study
-      (creates a fresh folder) or continuing an existing one (adds to that
-      folder's file). Participants won't see this screen again once it's set.
-    </div>
-    <button id="newStudyBtn" style="margin-top:0;">Start new study folder</button>
-    <button id="existingStudyBtn" class="secondary">Continue existing study folder</button>
-    <div class="status" id="setupStatus"></div>
-  </div>
-
   <!-- CONSENT -->
-  <div class="panel hidden" id="consentPanel">
+  <div class="panel" id="consentPanel">
     <div class="consent-text">
       <strong>Before we start:</strong> this is a short, informal survey for an
       independent research project. There are no right or wrong answers — just
@@ -291,12 +279,11 @@
     <div class="thanks">
       <div class="big">Thank you 🙏</div>
       <p style="font-family:-apple-system, Segoe UI, sans-serif; color:#6b6153; font-size:14px;">
-        Your response has been saved under ID <strong id="participantIdDisplay"></strong>.
-        Save this if you'd ever like your entry removed. <span id="countPill" class="count-pill">0 collected</span>
+        Your response has been sent under ID <strong id="participantIdDisplay"></strong>.
       </p>
       <p style="font-family:-apple-system, Segoe UI, sans-serif; color:#8a8072; font-size:12px; margin-top:16px;">
-        If anything that came up while writing feels heavy to carry, the 988 Suicide &amp; Crisis Lifeline
-        (call or text 988, US) is available any time.
+        If anything that came up while writing feels heavy to carry, the 988 Suicide Crisis Helpline
+        (call or text 988, Canada &amp; US) is available any time.
       </p>
       <button id="anotherBtn">Enter another response</button>
     </div>
@@ -305,8 +292,10 @@
 </div>
 
 <script>
-let dirHandle = null;
-let responseCount = 0;
+// SplitForms (splitforms.com) submission endpoint + access key.
+const SPLITFORMS_ENDPOINT = "https://splitforms.com/api/submit";
+const SPLITFORMS_ACCESS_KEY = "0fa686a7a8444e60b3662f662ca3b8e1";
+
 let usedIds = new Set();
 
 function generateParticipantId() {
@@ -318,80 +307,16 @@ function generateParticipantId() {
   return id;
 }
 
-const setupPanel = document.getElementById('setupPanel');
 const consentPanel = document.getElementById('consentPanel');
 const formPanel = document.getElementById('formPanel');
 const thanksPanel = document.getElementById('thanksPanel');
-const setupStatus = document.getElementById('setupStatus');
-const newStudyBtn = document.getElementById('newStudyBtn');
-const existingStudyBtn = document.getElementById('existingStudyBtn');
 const agreeBtn = document.getElementById('agreeBtn');
 const formStatus = document.getElementById('formStatus');
-const countPill = document.getElementById('countPill');
 
 function showStatus(el, kind, msg) {
   el.className = `status show ${kind}`;
   el.textContent = msg;
 }
-
-async function ensureSupported() {
-  if (!('showDirectoryPicker' in window)) {
-    showStatus(setupStatus, 'err',
-      "This browser doesn't support direct folder access. Please use Chrome or Edge.");
-    newStudyBtn.disabled = true;
-    existingStudyBtn.disabled = true;
-    return false;
-  }
-  return true;
-}
-
-async function setupResponsesFile() {
-  responseCount = 0;
-  usedIds.clear();
-  for await (const [name, handle] of dirHandle.entries()) {
-    if (handle.kind === 'file' && /^P-\d{4}\.json$/.test(name)) {
-      responseCount += 1;
-      usedIds.add(name.replace(/\.json$/, ''));
-    }
-  }
-  countPill.textContent = `${responseCount} collected`;
-  setupPanel.classList.add('hidden');
-  consentPanel.classList.remove('hidden');
-}
-
-newStudyBtn.addEventListener('click', async () => {
-  if (!(await ensureSupported())) return;
-  try {
-    const parent = await window.showDirectoryPicker({ mode: 'readwrite' });
-    const name = window.prompt("Name this study folder:", "study-" + new Date().toISOString().slice(0,10));
-    if (!name) {
-      showStatus(setupStatus, 'err', "Folder name is required — click Start new study folder again.");
-      return;
-    }
-    dirHandle = await parent.getDirectoryHandle(name, { create: true });
-    await setupResponsesFile();
-    showStatus(setupStatus, 'ok', `Created folder "${name}".`);
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error(err);
-      showStatus(setupStatus, 'err', "Couldn't create the study folder. Try again.");
-    }
-  }
-});
-
-existingStudyBtn.addEventListener('click', async () => {
-  if (!(await ensureSupported())) return;
-  try {
-    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-    await setupResponsesFile();
-    showStatus(setupStatus, 'ok', `Continuing study in "${dirHandle.name}".`);
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error(err);
-      showStatus(setupStatus, 'err', "Couldn't open that folder. Try again.");
-    }
-  }
-});
 
 agreeBtn.addEventListener('click', () => {
   consentPanel.classList.add('hidden');
@@ -430,8 +355,9 @@ function resetSteps() {
 
 document.getElementById('formPanel').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!dirHandle) {
-    showStatus(formStatus, 'err', "No file selected — please refresh and choose a file first.");
+
+  if (!SPLITFORMS_ACCESS_KEY || SPLITFORMS_ACCESS_KEY.startsWith('REPLACE_WITH')) {
+    showStatus(formStatus, 'err', "Form isn't set up yet — missing SplitForms access key.");
     return;
   }
 
@@ -449,16 +375,24 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
     current_challenges: document.getElementById('currentChallenges').value,
     ten_year_outlook: document.getElementById('tenYearOutlook').value
   };
-  const line = JSON.stringify(record, null, 2);
+
+  submitBtn.disabled = true;
+
+  const jsonBlob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+  const fd = new FormData();
+  fd.append('access_key', SPLITFORMS_ACCESS_KEY);
+  fd.append('participant_id', participantId);
+  fd.append('attachment', jsonBlob, `${participantId}.json`);
 
   try {
-    const submissionFile = await dirHandle.getFileHandle(`${participantId}.json`, { create: true });
-    const writable = await submissionFile.createWritable();
-    await writable.write(line);
-    await writable.close();
+    const res = await fetch(SPLITFORMS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: fd
+    });
 
-    responseCount += 1;
-    countPill.textContent = `${responseCount} collected`;
+    if (!res.ok) throw new Error(`Formspree responded ${res.status}`);
+
     document.getElementById('participantIdDisplay').textContent = participantId;
     formPanel.reset();
     resetSteps();
@@ -466,7 +400,9 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
     thanksPanel.classList.remove('hidden');
   } catch (err) {
     console.error(err);
-    showStatus(formStatus, 'err', "Couldn't save that response. Please try submitting again.");
+    showStatus(formStatus, 'err', "Couldn't send that response — check your connection and try again.");
+  } finally {
+    submitBtn.disabled = false;
   }
 });
 
@@ -475,8 +411,6 @@ document.getElementById('anotherBtn').addEventListener('click', () => {
   formPanel.classList.remove('hidden');
 });
 
-// initial support check for the examiner setup screen
-ensureSupported();
 renderStep();
 </script>
 </body>
