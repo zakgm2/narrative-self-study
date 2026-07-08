@@ -1,0 +1,2 @@
+pair,field_a,field_b,observed_mean_similarity,p_value,cohens_d,wc_coef_a,wc_pvalue_a,wc_coef_b,wc_pvalue_b,regression_r_squared,ci_lower,ci_upper,n_flagged_loo,flagged_participant_ids,p_value_fdr
+similar backstory,character_backstory,background,0.4862530529499054,0.004975124378109453,0.9978485959833462,-0.12100515401724843,0.04372827939768327,0.1818329768650475,0.0009812776070301469,0.639203303938563,0.4391643623218817,0.5242590079412741,4,"P-2743,P-3621,P-9322,P-9928",0.004975124378109453

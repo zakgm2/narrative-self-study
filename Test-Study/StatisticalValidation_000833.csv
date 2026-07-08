@@ -1,0 +1,2 @@
+pair,field_a,field_b,observed_mean_similarity,p_value,cohens_d,wc_coef_a,wc_pvalue_a,wc_coef_b,wc_pvalue_b,regression_r_squared,ci_lower,ci_upper,n_flagged_loo,flagged_participant_ids,p_value_fdr
+similar backstory,character_backstory,background,0.22299185395240784,1.0,,,,,,,0.22299185395240784,0.22299185395240784,0,,1.0

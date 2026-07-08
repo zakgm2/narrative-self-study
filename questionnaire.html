@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Narrative Self Project</title>
+<style>
+  :root {
+    --ink: #2b2620;
+    --paper: #f6f2ea;
+    --line: #d8cfc0;
+    --accent: #6b5b95;
+    --accent-dim: #8a7bb0;
+    --error: #a83232;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 60px;
+    min-height: 100vh;
+  }
+  .card {
+    width: 100%;
+    max-width: 560px;
+  }
+  .eyebrow {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 400;
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+  p.sub {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    color: #6b6153;
+    font-size: 14px;
+    margin: 0 0 28px;
+  }
+  .panel {
+    background: #fffdf9;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 24px;
+    margin-bottom: 18px;
+  }
+  .consent-text {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .consent-text strong { color: var(--accent); }
+  label {
+    display: block;
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #4a4335;
+    margin: 20px 0 6px;
+  }
+  label .hint {
+    font-weight: 400;
+    color: #8a8072;
+    display: block;
+    font-size: 12.5px;
+    margin-top: 2px;
+  }
+  textarea, select, input[type=text] {
+    width: 100%;
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    resize: vertical;
+  }
+  textarea { min-height: 90px; line-height: 1.5; }
+  textarea:focus, select:focus, input:focus {
+    outline: 2px solid var(--accent-dim);
+    outline-offset: 1px;
+  }
+  button {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 13px 22px;
+    border-radius: 7px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 22px;
+    transition: background 0.15s ease;
+  }
+  button:hover { background: #5a4c80; }
+  button:disabled { background: #c9c2b6; cursor: not-allowed; }
+  button.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+  }
+  button.secondary:hover { background: #efe9f7; }
+  .status {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 13px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .status.show { display: block; }
+  .status.ok { background: #e7f2e5; color: #2f5c2a; }
+  .status.err { background: #f7e4e2; color: var(--error); }
+  .status.info { background: #ece7f5; color: #4a3d6e; }
+  .filebar {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 13px;
+    color: #6b6153;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .filebar strong { color: var(--ink); }
+  .hidden { display: none !important; }
+  .count-pill {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .thanks {
+    text-align: center;
+    padding: 30px 10px 10px;
+  }
+  .thanks .big {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .progress-wrap {
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-family: -apple-system, Segoe UI, sans-serif;
+    font-size: 12.5px;
+    color: #8a8072;
+    margin-bottom: 8px;
+  }
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background: #ece5d8;
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    width: 16.66%;
+    transition: width 0.25s ease;
+  }
+  .step label:first-child { margin-top: 0; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="eyebrow">The Narrative Self Project</div>
+  <h1>A few open-ended questions</h1>
+  <p class="sub">Takes about 3–5 minutes. Your answers are anonymous.</p>
+
+  <!-- EXAMINER SETUP -->
+  <div class="panel" id="setupPanel">
+    <div class="consent-text" style="margin-bottom:16px;">
+      <strong>Examiner setup:</strong> choose whether this is a new study
+      (creates a fresh folder) or continuing an existing one (adds to that
+      folder's file). Participants won't see this screen again once it's set.
+    </div>
+    <button id="newStudyBtn" style="margin-top:0;">Start new study folder</button>
+    <button id="existingStudyBtn" class="secondary">Continue existing study folder</button>
+    <div class="status" id="setupStatus"></div>
+  </div>
+
+  <!-- CONSENT -->
+  <div class="panel hidden" id="consentPanel">
+    <div class="consent-text">
+      <strong>Before we start:</strong> this is a short, informal survey for an
+      independent research project. There are no right or wrong answers — just
+      write what comes to mind. A couple of questions touch on your upbringing
+      and how things are going for you currently; these are entirely optional, and it's fine to write one word, skip them,
+      or stop the survey altogether at any point. Your responses are stored
+      under a random ID, not your name. By continuing, you're agreeing to
+      take part on that basis.
+    </div>
+    <button id="agreeBtn">I understand, let's begin</button>
+  </div>
+
+  <!-- FORM -->
+  <form class="panel hidden" id="formPanel">
+    <div class="progress-wrap">
+      <div class="progress-label" id="progressLabel">Question 1 of 7</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="step" data-step="1">
+      <label style="margin-top:0;">Age range</label>
+      <select id="ageRange">
+        <option value="">Prefer not to say</option>
+        <option>18–24</option>
+        <option>25–34</option>
+        <option>35–44</option>
+        <option>45–54</option>
+        <option>55+</option>
+      </select>
+    </div>
+
+    <div class="step hidden" data-step="2">
+      <label style="margin-top:0;">Who is your favorite fictional character, and where are they from?
+        <span class="hint">A show, book, movie, game — anything.</span>
+      </label>
+      <input type="text" id="charName" placeholder="Character name + story it's from">
+      <label>Tell me about that character's backstory.
+        <span class="hint">Where did they come from, what shaped them early on?</span>
+      </label>
+      <textarea id="charBackstory"></textarea>
+    </div>
+
+    <div class="step hidden" data-step="3">
+      <label style="margin-top:0;">What challenges did they face, and how did they change or grow because of them?
+        <span class="hint">What are they like by the end, compared to the start?</span>
+      </label>
+      <textarea id="charEvolution"></textarea>
+    </div>
+
+    <div class="step hidden" data-step="4">
+      <label style="margin-top:0;">Describe your ideal home in as much detail as you can.
+        <span class="hint">Who's there with you? What are its main features? What do the windows look like? Where is it? Real or imaginary, whatever comes to mind.</span>
+      </label>
+      <textarea id="idealHome"></textarea>
+    </div>
+
+    <div class="step hidden" data-step="5">
+      <label style="margin-top:0;">Tell me about your upbringing — what was your home life and early childhood like?
+        <span class="hint">A sentence or two is plenty. Totally optional — skip if you'd rather not.</span>
+      </label>
+      <textarea id="background"></textarea>
+    </div>
+
+    <div class="step hidden" data-step="6">
+      <label style="margin-top:0;">How are you doing right now? Any challenges you're facing?
+        <span class="hint">Whatever feels true — a sentence is plenty, and it's fine to skip this one.</span>
+      </label>
+      <textarea id="currentChallenges"></textarea>
+    </div>
+
+    <div class="step hidden" data-step="7">
+      <label style="margin-top:0;">Where do you picture yourself in 10 years?
+        <span class="hint">Whatever comes to mind first.</span>
+      </label>
+      <textarea id="tenYearOutlook"></textarea>
+    </div>
+
+    <button type="button" id="continueBtn">Continue</button>
+    <button type="submit" id="submitBtn" class="hidden">Submit response</button>
+    <div class="status" id="formStatus"></div>
+  </form>
+
+  <!-- THANK YOU -->
+  <div class="panel hidden" id="thanksPanel">
+    <div class="thanks">
+      <div class="big">Thank you 🙏</div>
+      <p style="font-family:-apple-system, Segoe UI, sans-serif; color:#6b6153; font-size:14px;">
+        Your response has been saved under ID <strong id="participantIdDisplay"></strong>.
+        Save this if you'd ever like your entry removed. <span id="countPill" class="count-pill">0 collected</span>
+      </p>
+      <p style="font-family:-apple-system, Segoe UI, sans-serif; color:#8a8072; font-size:12px; margin-top:16px;">
+        If anything that came up while writing feels heavy to carry, the 988 Suicide &amp; Crisis Lifeline
+        (call or text 988, US) is available any time.
+      </p>
+      <button id="anotherBtn">Enter another response</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let dirHandle = null;
+let responseCount = 0;
+let usedIds = new Set();
+
+function generateParticipantId() {
+  let id;
+  do {
+    id = "P-" + Math.floor(1000 + Math.random() * 9000);
+  } while (usedIds.has(id));
+  usedIds.add(id);
+  return id;
+}
+
+const setupPanel = document.getElementById('setupPanel');
+const consentPanel = document.getElementById('consentPanel');
+const formPanel = document.getElementById('formPanel');
+const thanksPanel = document.getElementById('thanksPanel');
+const setupStatus = document.getElementById('setupStatus');
+const newStudyBtn = document.getElementById('newStudyBtn');
+const existingStudyBtn = document.getElementById('existingStudyBtn');
+const agreeBtn = document.getElementById('agreeBtn');
+const formStatus = document.getElementById('formStatus');
+const countPill = document.getElementById('countPill');
+
+function showStatus(el, kind, msg) {
+  el.className = `status show ${kind}`;
+  el.textContent = msg;
+}
+
+async function ensureSupported() {
+  if (!('showDirectoryPicker' in window)) {
+    showStatus(setupStatus, 'err',
+      "This browser doesn't support direct folder access. Please use Chrome or Edge.");
+    newStudyBtn.disabled = true;
+    existingStudyBtn.disabled = true;
+    return false;
+  }
+  return true;
+}
+
+async function setupResponsesFile() {
+  responseCount = 0;
+  usedIds.clear();
+  for await (const [name, handle] of dirHandle.entries()) {
+    if (handle.kind === 'file' && /^P-\d{4}\.json$/.test(name)) {
+      responseCount += 1;
+      usedIds.add(name.replace(/\.json$/, ''));
+    }
+  }
+  countPill.textContent = `${responseCount} collected`;
+  setupPanel.classList.add('hidden');
+  consentPanel.classList.remove('hidden');
+}
+
+newStudyBtn.addEventListener('click', async () => {
+  if (!(await ensureSupported())) return;
+  try {
+    const parent = await window.showDirectoryPicker({ mode: 'readwrite' });
+    const name = window.prompt("Name this study folder:", "study-" + new Date().toISOString().slice(0,10));
+    if (!name) {
+      showStatus(setupStatus, 'err', "Folder name is required — click Start new study folder again.");
+      return;
+    }
+    dirHandle = await parent.getDirectoryHandle(name, { create: true });
+    await setupResponsesFile();
+    showStatus(setupStatus, 'ok', `Created folder "${name}".`);
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error(err);
+      showStatus(setupStatus, 'err', "Couldn't create the study folder. Try again.");
+    }
+  }
+});
+
+existingStudyBtn.addEventListener('click', async () => {
+  if (!(await ensureSupported())) return;
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await setupResponsesFile();
+    showStatus(setupStatus, 'ok', `Continuing study in "${dirHandle.name}".`);
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error(err);
+      showStatus(setupStatus, 'err', "Couldn't open that folder. Try again.");
+    }
+  }
+});
+
+agreeBtn.addEventListener('click', () => {
+  consentPanel.classList.add('hidden');
+  formPanel.classList.remove('hidden');
+});
+
+const TOTAL_STEPS = 7;
+let currentStep = 1;
+const continueBtn = document.getElementById('continueBtn');
+const submitBtn = document.getElementById('submitBtn');
+const progressLabel = document.getElementById('progressLabel');
+const progressFill = document.getElementById('progressFill');
+
+function renderStep() {
+  document.querySelectorAll('.step').forEach(el => {
+    el.classList.toggle('hidden', Number(el.dataset.step) !== currentStep);
+  });
+  progressLabel.textContent = `Question ${currentStep} of ${TOTAL_STEPS}`;
+  progressFill.style.width = `${(currentStep / TOTAL_STEPS) * 100}%`;
+  const isLast = currentStep === TOTAL_STEPS;
+  continueBtn.classList.toggle('hidden', isLast);
+  submitBtn.classList.toggle('hidden', !isLast);
+}
+
+continueBtn.addEventListener('click', () => {
+  if (currentStep < TOTAL_STEPS) {
+    currentStep += 1;
+    renderStep();
+  }
+});
+
+function resetSteps() {
+  currentStep = 1;
+  renderStep();
+}
+
+document.getElementById('formPanel').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!dirHandle) {
+    showStatus(formStatus, 'err', "No file selected — please refresh and choose a file first.");
+    return;
+  }
+
+  const participantId = generateParticipantId();
+
+  const record = {
+    participant_id: participantId,
+    timestamp: new Date().toISOString(),
+    age_range: document.getElementById('ageRange').value,
+    character_name: document.getElementById('charName').value,
+    character_backstory: document.getElementById('charBackstory').value,
+    character_evolution: document.getElementById('charEvolution').value,
+    ideal_home: document.getElementById('idealHome').value,
+    background: document.getElementById('background').value,
+    current_challenges: document.getElementById('currentChallenges').value,
+    ten_year_outlook: document.getElementById('tenYearOutlook').value
+  };
+  const line = JSON.stringify(record, null, 2);
+
+  try {
+    const submissionFile = await dirHandle.getFileHandle(`${participantId}.json`, { create: true });
+    const writable = await submissionFile.createWritable();
+    await writable.write(line);
+    await writable.close();
+
+    responseCount += 1;
+    countPill.textContent = `${responseCount} collected`;
+    document.getElementById('participantIdDisplay').textContent = participantId;
+    formPanel.reset();
+    resetSteps();
+    formPanel.classList.add('hidden');
+    thanksPanel.classList.remove('hidden');
+  } catch (err) {
+    console.error(err);
+    showStatus(formStatus, 'err', "Couldn't save that response. Please try submitting again.");
+  }
+});
+
+document.getElementById('anotherBtn').addEventListener('click', () => {
+  thanksPanel.classList.add('hidden');
+  formPanel.classList.remove('hidden');
+});
+
+// initial support check for the examiner setup screen
+ensureSupported();
+renderStep();
+</script>
+</body>
+</html>
