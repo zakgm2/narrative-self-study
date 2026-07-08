@@ -190,6 +190,17 @@
   <h1>A few open-ended questions</h1>
   <p class="sub">Takes about 3–5 minutes. Your answers are anonymous.</p>
 
+  <!-- ALREADY SUBMITTED -->
+  <div class="panel hidden" id="alreadyPanel">
+    <div class="thanks">
+      <div class="big">You're all set 🙏</div>
+      <p style="font-family:-apple-system, Segoe UI, sans-serif; color:#6b6153; font-size:14px;">
+        This device has already submitted a response for this study. Thanks again for taking part —
+        no need to fill it out again.
+      </p>
+    </div>
+  </div>
+
   <!-- CONSENT -->
   <div class="panel" id="consentPanel">
     <div class="consent-text">
@@ -285,7 +296,6 @@
         If anything that came up while writing feels heavy to carry, the 988 Suicide Crisis Helpline
         (call or text 988, Canada &amp; US) is available any time.
       </p>
-      <button id="anotherBtn">Enter another response</button>
     </div>
   </div>
 
@@ -307,6 +317,9 @@ function generateParticipantId() {
   return id;
 }
 
+const SUBMITTED_KEY = 'narrativeSelfSubmitted';
+
+const alreadyPanel = document.getElementById('alreadyPanel');
 const consentPanel = document.getElementById('consentPanel');
 const formPanel = document.getElementById('formPanel');
 const thanksPanel = document.getElementById('thanksPanel');
@@ -316,6 +329,11 @@ const formStatus = document.getElementById('formStatus');
 function showStatus(el, kind, msg) {
   el.className = `status show ${kind}`;
   el.textContent = msg;
+}
+
+if (localStorage.getItem(SUBMITTED_KEY)) {
+  consentPanel.classList.add('hidden');
+  alreadyPanel.classList.remove('hidden');
 }
 
 agreeBtn.addEventListener('click', () => {
@@ -393,6 +411,7 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
 
     if (!res.ok) throw new Error(`Formspree responded ${res.status}`);
 
+    localStorage.setItem(SUBMITTED_KEY, participantId);
     document.getElementById('participantIdDisplay').textContent = participantId;
     formPanel.reset();
     resetSteps();
@@ -404,11 +423,6 @@ document.getElementById('formPanel').addEventListener('submit', async (e) => {
   } finally {
     submitBtn.disabled = false;
   }
-});
-
-document.getElementById('anotherBtn').addEventListener('click', () => {
-  thanksPanel.classList.add('hidden');
-  formPanel.classList.remove('hidden');
 });
 
 renderStep();
